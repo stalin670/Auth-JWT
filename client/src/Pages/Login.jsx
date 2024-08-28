@@ -3,8 +3,8 @@ import {useNavigate} from "react-router-dom"
 import '../style/login.css'
 
 export const Login = () => {
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
     const navigate = useNavigate()
 
     const handleLogin = async (event) => {
@@ -47,7 +47,7 @@ export const Login = () => {
         <button type='submit' >Login</button>
         </form>
         <p>
-            Don't have an account ? <button >Signup</button>
+            Don't have an account ? <button onClick={() => navigate('/register')} >Signup</button>
         </p>
     </div>
   )

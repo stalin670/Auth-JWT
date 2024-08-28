@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import "../style/register.css";
 
 export const Register = () => {
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  // const navigate = useNavigate()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate()
 
   const handleSignup = async (event) => {
     event.preventDefault();
@@ -25,6 +25,14 @@ export const Register = () => {
       });
 
       const data = await response.json();
+      if(data.status === 'ok') {
+        alert("Registered Successful")
+        navigate('/login')
+      }
+      else {
+        alert("User Already Exist, Please Login !")
+        navigate('/login')
+      }
 
       console.log(data);
     } catch (error) {
@@ -57,7 +65,7 @@ export const Register = () => {
         <button type="submit">Signup</button>
         </form>
         <p>
-          Already have an account ? <button>Login</button>
+          Already have an account ? <button onClick={() => navigate('/login')} >Login</button>
         </p>
     </div>
   );
