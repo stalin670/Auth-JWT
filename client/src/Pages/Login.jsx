@@ -24,7 +24,7 @@ export const Login = () => {
     
           const data = await response.json();
 
-          if(data.user) {
+          if(data.success) {
             alert('Login Successful')
             navigate('/Dashboard')
           }

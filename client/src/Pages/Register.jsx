@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../style/register.css";
 
 export const Register = () => {
-  const [name, setName] = useState("");
+  const [userName, setuserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate()
@@ -18,14 +18,15 @@ export const Register = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
+          userName,
           email,
           password,
         }),
       });
 
       const data = await response.json();
-      if(data.status === 'ok') {
+      // console.log(data)
+      if(data.success) {
         alert("Registered Successful")
         navigate('/login')
       }
@@ -46,9 +47,9 @@ export const Register = () => {
       <form onSubmit={handleSignup}>
         <input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Name"
+          value={userName}
+          onChange={(e) => setuserName(e.target.value)}
+          placeholder="userName"
         />
         <input
           type="email"
