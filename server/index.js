@@ -6,6 +6,8 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const User = require('./models/user.model')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
+const { registerValidation, loginValidation } = require('../server/config/validation')
 
 require("dotenv").config()
 const PORT = process.env.PORT
@@ -18,38 +20,100 @@ app.use(express.json())
 mongoose.connect(MONGODB_URL)
 
 app.post('/api/register', async (req, res) => {
-    console.log(req.body)
     try {
-        const user = await User.create({
-            name : req.body.name,
+
+        // UserName , email, Password is valid or not
+        const validationFail = registerValidation(req.body);
+        if(validationFail) {
+            return res.status(500).json({
+                success : false,
+                message : validationFail
+            });
+        }
+
+        // User is already in the database or not
+        const userExist = await User.findOne({email : req.body.email});
+        if(userExist) {
+            return res.status(500).json({
+                success : false,
+                message : "User already exists"
+            });
+        }
+
+        // Hash the password using BcryptJs
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+        // Create a new User
+        const user = new User({
+            userName : req.body.userName,
             email : req.body.email,
-            password : req.body.password,
-        })
-        res.json({status : 'ok'})
+            password : hashedPassword,
+        });
+
+        // save the new user
+        const savedUser = await user.save();
+        return res.status(200).json({
+            success : true,
+            user : user._id,
+        });
+
     } catch (error) {
-        console.log(error)
-        res.json({status : 'error'})
+        return res.status(500).json({
+            success : false,
+            message : error,
+        });
     }
 })
 
 app.post('/api/login', async (req, res) => {
-    console.log(req.body)
-    
-    const user = await User.findOne({
-        email : req.body.email,
-        password : req.body.password,
-    })
+    try {
 
-    if(user) {
-        
-        const token = jwt.sign({
-            email : user.email,
-        }, SECRET_KEY, )
-        
-        res.json({status : 'ok', user : token})
-    }
-    else {
-        res.json({status : 'error', user : false})
+        // Validation for email and password
+        const validationFail = loginValidation(req.body);
+        if(validationFail) {
+            return res.status(500).json({
+                success : false,
+                message : validationFail,
+            });
+        }
+
+        // Check if User exist or not
+        const user = await Userer.findOne({email : req.body.email});
+        if(!user) {
+            return res.status(500).json({
+                success : false,
+                message : 'Email is not found',
+            });
+        }
+
+        // Check if the password is correct or not
+        const validPassword = await bcrypt.compare(req.body.password, user.password);
+        if(!validPassword) {
+            return res.status(500).json({
+                success : false,
+                message : "Invalid Password! Password do not match!",
+            });
+        }
+
+        // Create JWT Token
+        const token = jwt.sign({ _id : user._id }, process.env.SECRET_KEY, {
+            expiresIn : "18h",
+        });
+        // console.log("I'm not in the error")
+        return res.status(200).header("Authorization", token).send({
+            success : true,
+            message : "Login successful",
+            token : token,
+            user : user,
+        });
+
+    } catch (error) {
+        // console.log("I'm in the error")
+        return res.status(500).json({
+            success : false,
+            message : error,
+        });      
     }
 })
 
