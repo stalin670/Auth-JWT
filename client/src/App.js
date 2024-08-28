@@ -1,7 +1,8 @@
-import './App.css';
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
 import { Register } from './Pages/Register';
 import { Login } from './Pages/Login'
-import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom'
+import Dashboard from './Pages/Dashboard';
+import './App.css';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Route path='/' element={<Navigate to='/Login' />} />
         <Route path='/Login' element={<Login />} />
         <Route path='/Register' element={<Register />} />
+        <Route path='/Dashboard' element={<Dashboard />} />
       </Routes>
     </Router>
   );

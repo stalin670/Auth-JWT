@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-// import {useNavigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import '../style/login.css'
 
 export const Login = () => {
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
-    // const navigate = useNavigate()
+    const navigate = useNavigate()
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -23,6 +23,14 @@ export const Login = () => {
           });
     
           const data = await response.json();
+
+          if(data.user) {
+            alert('Login Successful')
+            navigate('/Dashboard')
+          }
+          else {
+            alert('Username or Password is Incorrect')
+          }
     
           console.log(data);
         } catch (error) {
