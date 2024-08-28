@@ -7,10 +7,15 @@ const mongoose = require('mongoose')
 const User = require('./models/user.model')
 const jwt = require('jsonwebtoken')
 
+require("dotenv").config()
+const PORT = process.env.PORT
+const SECRET_KEY = process.env.SECRET_KEY
+const MONGODB_URL = process.env.MONGODB_URL
+
 app.use(cors())
 app.use(express.json())
 
-mongoose.connect('mongodb://localhost:27017/Auth-JWT')
+mongoose.connect(MONGODB_URL)
 
 app.post('/api/register', async (req, res) => {
     console.log(req.body)
@@ -39,10 +44,9 @@ app.post('/api/login', async (req, res) => {
         
         const token = jwt.sign({
             email : user.email,
-            password : user.password,
-        }, 'amit123', )
-
-        res.json({status : 'ok', user : true})
+        }, SECRET_KEY, )
+        
+        res.json({status : 'ok', user : token})
     }
     else {
         res.json({status : 'error', user : false})
@@ -50,5 +54,5 @@ app.post('/api/login', async (req, res) => {
 })
 
 app.listen(4000, () => {
-    console.log(`Server is running on port 4000`);
+    console.log(`Server is running on port ${PORT}`);
 })
