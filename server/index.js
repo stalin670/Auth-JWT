@@ -79,7 +79,7 @@ app.post('/api/login', async (req, res) => {
         }
 
         // Check if User exist or not
-        const user = await Userer.findOne({email : req.body.email});
+        const user = await User.findOne({email : req.body.email});
         if(!user) {
             return res.status(500).json({
                 success : false,
@@ -115,6 +115,47 @@ app.post('/api/login', async (req, res) => {
             message : error,
         });      
     }
+})
+
+app.get('/api/quote', async (req, res) => {
+
+    const token = req.headers['x-access-token'];
+
+    console.log(token);
+
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        console.log("Yaha aa rha hai ya nhi")
+        const email = decoded.email;    
+
+        const user = await User.findOne({email : email});
+        console.log(user.quote)
+        return res.json({success : true, quote : user.quote})
+
+    } catch (error) {
+        console.log(error);
+        return res.json({ success : false, message : "Invalid token" })
+    }
+    
+})
+
+app.post('/api/quote', async (req, res) => {
+
+    const token = req.headers['x-access-token'];
+
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        const email = decoded.email;    
+
+        await User.updateOne({email : email}, { $set : {quote : req.body.quote}});
+
+        return res.json({success : true})
+
+    } catch (error) {
+        console.log(error);
+        return res.json({ success : false, message : "Invalid token" })
+    }
+    
 })
 
 app.listen(4000, () => {
