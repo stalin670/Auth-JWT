@@ -26,10 +26,11 @@ export const Login = () => {
 
           if(data.success) {
             alert('Login Successful')
+            localStorage.setItem('token', data.token);
             navigate('/Dashboard')
           }
           else {
-            alert('Username or Password is Incorrect')
+            alert('Email or Password is Incorrect')
           }
     
           console.log(data);
