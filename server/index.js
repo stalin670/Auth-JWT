@@ -2,19 +2,26 @@
 
 const express = require('express')
 const app = express()
+const cookieParser = require("cookie-parser");
 const cors = require('cors')
 const mongoose = require('mongoose')
 const User = require('./models/user.model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const { registerValidation, loginValidation } = require('../server/config/validation')
+const authMiddleware  = require('./middlewares/auth.js')
 
 require("dotenv").config()
 const PORT = process.env.PORT
 const SECRET_KEY = process.env.SECRET_KEY
 const MONGODB_URL = process.env.MONGODB_URL
 
-app.use(cors())
+app.use(cookieParser())
+
+app.use(cors({
+    "credentials": true,
+    origin: "http://localhost:3000"
+}))
 app.use(express.json())
 
 mongoose.connect(MONGODB_URL)
@@ -51,11 +58,13 @@ app.post('/api/register', async (req, res) => {
             password : hashedPassword,
         });
 
+        console.log(user)
+
         // save the new user
         const savedUser = await user.save();
         return res.status(200).json({
             success : true,
-            user : user._id,
+            user : savedUser,
         });
 
     } catch (error) {
@@ -81,7 +90,7 @@ app.post('/api/login', async (req, res) => {
         // Check if User exist or not
         const user = await User.findOne({email : req.body.email});
         if(!user) {
-            return res.status(500).json({
+            return res.status(404).json({
                 success : false,
                 message : 'Email is not found',
             });
@@ -90,21 +99,27 @@ app.post('/api/login', async (req, res) => {
         // Check if the password is correct or not
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if(!validPassword) {
-            return res.status(500).json({
+            return res.status(401).json({
                 success : false,
                 message : "Invalid Password! Password do not match!",
             });
         }
 
         // Create JWT Token
-        const token = jwt.sign({ _id : user._id }, process.env.SECRET_KEY, {
+        const token = jwt.sign({ user: user }, process.env.SECRET_KEY, {
             expiresIn : "18h",
         });
+        // console.log(token);
         // console.log("I'm not in the error")
-        return res.status(200).header("Authorization", token).send({
+
+        return res.cookie("token", token, {
+            secure: true,
+            sameSite: "none",
+            httpOnly: true
+        }).status(200).send({
             success : true,
             message : "Login successful",
-            token : token,
+            // token : token,
             user : user,
         });
 
@@ -117,19 +132,15 @@ app.post('/api/login', async (req, res) => {
     }
 })
 
-app.get('/api/quote', async (req, res) => {
+app.get('/api/quote', authMiddleware, async (req, res) => {
 
-    const token = req.headers['x-access-token'];
+    // const token = req.headers['x-access-token'];
 
-    console.log(token);
+    // console.log(token);
 
     try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        console.log("Yaha aa rha hai ya nhi")
-        const email = decoded.email;    
-
-        const user = await User.findOne({email : email});
-        console.log(user.quote)
+        const user = await User.findOne({email : req.user.email});
+        console.log(user)
         return res.json({success : true, quote : user.quote})
 
     } catch (error) {
@@ -139,17 +150,15 @@ app.get('/api/quote', async (req, res) => {
     
 })
 
-app.post('/api/quote', async (req, res) => {
-
-    const token = req.headers['x-access-token'];
-
+app.post('/api/quote', authMiddleware, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        const email = decoded.email;    
+        const user = await User.findOneAndUpdate(
+            { email: req.user.email }, 
+            { $set: { quote: req.body.quote } }, 
+            { new: true }
+          );
 
-        await User.updateOne({email : email}, { $set : {quote : req.body.quote}});
-
-        return res.json({success : true})
+        return res.json({success : true, user: user})
 
     } catch (error) {
         console.log(error);
