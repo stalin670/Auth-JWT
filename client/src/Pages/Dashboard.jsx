@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../style/dashboard.css";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ export const Dashboard = () => {
   }
 
   return (
-    <div>
+    <div className="Form-Container">
       <h1> Your quote : {quote || "No quote found"} </h1>
       <form onSubmit={updateQuote}>
         <input
@@ -61,7 +62,8 @@ export const Dashboard = () => {
           value={quote}
           onChange={(e) => setQuote(e.target.value)}
         />
-        <input type="submit" value="Update Quote" />
+        <br />
+        <input className="submit_button"  type="submit" value="Update Quote" />
       </form>
     </div>
   );
