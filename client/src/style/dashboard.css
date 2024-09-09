@@ -1,4 +1,4 @@
-.Form-Container {
+.Form-Container-Dashboard {
   max-width: 800px;
   margin: 100px auto;
   padding: 100px;
@@ -9,11 +9,11 @@
   text-align: center;
 }
 
-h1 {
+.Quote {
   margin-bottom: 60px;
 }
 
-input {
+.input-field {
   padding: 20px;
   margin-bottom: 5px;
 }

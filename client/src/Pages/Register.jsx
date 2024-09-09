@@ -41,7 +41,7 @@ export const Register = () => {
   };
 
   return (
-    <div className="Form-Container">
+    <div className="Form-Container-Register">
       <h2>Sign Up</h2>
       <form onSubmit={handleSignup}>
         <input

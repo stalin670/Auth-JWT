@@ -53,10 +53,10 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="Form-Container">
-      <h1> Your quote : {quote || "No quote found"} </h1>
+    <div className="Form-Container-Dashboard">
+      <h1 className="Quote"> Your quote : {quote || "No quote found"} </h1>
       <form onSubmit={updateQuote}>
-        <input
+        <input className="input-field"
           type="text"
           placeholder="Quote"
           value={quote}
