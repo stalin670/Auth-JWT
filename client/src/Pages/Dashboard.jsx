@@ -1,85 +1,68 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Dashboard = () => {
-
   const navigate = useNavigate();
   const [quote, setQuote] = useState("");
-  const [tempquote, setTempQuote] = useState("");
-
-  async function parseJwt(token) {
-    if (!token) {
-      return;
-    }
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace("-", "+").replace("_", "/");
-    return JSON.parse(window.atob(base64));
-  }
-
-  async function populateQuote() {
-    const req = await fetch('http://localhost:4000/api/quote', {
-      headers : {
-        'x-access-token' : localStorage.getItem('token'),
-      },
-    })
-
-    const data = await req.json();
-    if(data.success) {
-      setQuote(data.quote);
-    }
-    else {
-      alert(data.error);
-    }
-  }
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if(token) { 
-      const user = parseJwt(token);
-      if(!user) {
-        localStorage.removeItem('token');
-        navigate('/login');
-      }
-      else {
-        populateQuote()
+    async function populateQuote() {
+      const req = await fetch("http://localhost:4000/api/quote", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await req.json();
+      console.log(data);
+      if (data.success) {
+        setQuote(data.quote);
+      } else {
+        if (req.status == 401) {
+          navigate("/login");
+        } else {
+          alert("OOPs something went wrong!");
+        }
       }
     }
-
+    populateQuote();
   }, []);
 
   async function updateQuote(event) {
     event.preventDefault();
-    const req = await fetch('http://localhost:4000/api/quote', {
-      method : 'POST',
-      headers : {
-        'Content-Type' : 'application/json',
-        'x-access-token' : localStorage.getItem('token'),
+    const req = await fetch("http://localhost:4000/api/quote", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      body : JSON.stringify({
-        quote : tempquote,
+      credentials: "include",
+      body: JSON.stringify({
+        quote: quote,
       }),
-    })
+    });
 
     const data = await req.json();
-    if(data.success) {
-      setQuote(tempquote);
-      setTempQuote('');
-    }
-    else {
-      alert(data.error);
+    if (data.success) {
+      setQuote(quote);
+    } else {
+      alert(data);
     }
   }
 
   return (
     <div>
-      <h1> Your quote : { quote || 'No quote found' } </h1>
+      <h1> Your quote : {quote || "No quote found"} </h1>
       <form onSubmit={updateQuote}>
-        <input type = 'text' 
-              placeholder='Quote' 
-              value={tempquote} 
-              onChange = {(e) => setTempQuote(e.target.value)} />
-        <input type='submit' value="Update Quote" />
+        <input
+          type="text"
+          placeholder="Quote"
+          value={quote}
+          onChange={(e) => setQuote(e.target.value)}
+        />
+        <input type="submit" value="Update Quote" />
       </form>
     </div>
-  )
-}
+  );
+};

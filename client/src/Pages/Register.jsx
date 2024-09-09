@@ -6,7 +6,7 @@ export const Register = () => {
   const [userName, setuserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSignup = async (event) => {
     event.preventDefault();
@@ -26,13 +26,12 @@ export const Register = () => {
 
       const data = await response.json();
       // console.log(data)
-      if(data.success) {
-        alert("Registered Successful")
-        navigate('/login')
-      }
-      else {
-        alert("User Already Exist, Please Login !")
-        navigate('/login')
+      if (data.success) {
+        alert("Registered Successful");
+        navigate("/login");
+      } else {
+        alert("User Already Exist, Please Login !");
+        navigate("/login");
       }
 
       console.log(data);
@@ -43,7 +42,7 @@ export const Register = () => {
 
   return (
     <div className="Form-Container">
-        <h2>Sign Up</h2>
+      <h2>Sign Up</h2>
       <form onSubmit={handleSignup}>
         <input
           type="text"
@@ -64,10 +63,11 @@ export const Register = () => {
           placeholder="Password"
         />
         <button type="submit">Signup</button>
-        </form>
-        <p>
-          Already have an account ? <button onClick={() => navigate('/login')} >Login</button>
-        </p>
+      </form>
+      <p>
+        Already have an account ?{" "}
+        <button onClick={() => navigate("/login")}>Login</button>
+      </p>
     </div>
   );
 };
