@@ -8,7 +8,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     async function populateQuote() {
-      const req = await fetch("http://localhost:4000/api/quote", {
+      const req = await fetch("https://auth-jwt-tqb4.onrender.com/api/quote", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export const Dashboard = () => {
 
   async function updateQuote(event) {
     event.preventDefault();
-    const req = await fetch("http://localhost:4000/api/quote", {
+    const req = await fetch("https://auth-jwt-tqb4.onrender.com/api/quote", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
