@@ -12,17 +12,20 @@ export const Register = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch("https://auth-jwt-tqb4.onrender.com/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userName,
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        "https://auth-jwt-tqb4.onrender.com/api/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userName,
+            email,
+            password,
+          }),
+        }
+      );
 
       const data = await response.json();
       // console.log(data)
@@ -30,7 +33,7 @@ export const Register = () => {
         alert("Registered Successful");
         navigate("/login");
       } else {
-        alert("User Already Exist, Please Login !");
+        alert(data.message);
         navigate("/login");
       }
 
